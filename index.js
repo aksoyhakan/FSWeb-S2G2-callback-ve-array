@@ -154,70 +154,114 @@ console.log(OrtalamaGolSayisi(Finaller(fifaData)));
 	İpucu: "takım kısaltmaları" (team initials) için datada araştırma yapın!
 İpucu: `.reduce` Kullanın*/
 
-/*function UlkelerinKazanmaSayilari(data) {
-	let finalMacları = data.filter((array)=>{return array.Stage==="Final";});
-	let sonucListe=[];
-	let newList={};
-	let kupaKazananlar = finalMacları.map((array)=>{ 
+function UlkelerinKazanmaSayilari(data) {
+	let finalMaclar = (data.filter(mac=>mac["Stage"]==="Final")).map((array)=>{ 
 		if(array["Home Team Goals"] > array["Away Team Goals"]){
-			return {"Initials":array["Home Team Initials"], "worldCup":1};
+			return array["Home Team Name"];
 		} else if(array["Away Team Goals"]> array["Home Team Goals"]){
-			return {"Initials":array["Away Team Initials"], "worldCup":1} ;
+			return array["Away Team Name"];
 		} else{
 			let newItem = array["Win conditions"];
 			let newArray = newItem.split(" win");
-			if(newArray[0]===array["Home Team Name"]){
-				return {"Initials":array["Home Team Initials"], "worldCup":1};
-			} else return {"Initials":array["Away Team Initials"], "worldCup":1};
+			return newArray[0];
 		}
 	});
-	console.log(kupaKazananlar);
-	for (let i=0;i<kupaKazananlar.length;i++){
-		if (i===0){
-			newList["Initials"]=kupaKazananlar[0]["Initials"];
-			newList["worldCup"]= 1;
-			sonucListe.push(newList);
-			console.log(newList);
-		}
-		for(let j = 0; j<sonucListe.length;j++){
-			if(sonucListe[j]["Initials"]===kupaKazananlar[i]["Initials"]){
-				sonucListe[j]["worldCup"]=sonucListe[j]["worldCup"]+1;
-				console.log(newList);
-				break;
-			}else{
-				newList["Initials"]=kupaKazananlar[i]["Initials"];
-				newList["worldCup"]=1;
-				sonucListe.push(newList);
-				console.log(newList);
-				break;
-			}
-		}
-	} 
-	return sonucListe;
-}
-console.clear();
 
-console.log(UlkelerinKazanmaSayilari(fifaData));*/
+	let sonuc= finalMaclar.reduce((allCountry, finalMaclar)=>{ 
+		if (finalMaclar in allCountry){
+			allCountry[finalMaclar]++;
+		}else{
+			allCountry[finalMaclar]=1;
+		}return allCountry;
+	}, {});
+	
+	return sonuc;
+}
+console.log(UlkelerinKazanmaSayilari(fifaData));	
 
 /*  BONUS 2:  
 EnCokGolAtan() isminde bir fonksiyon yazın, `data` yı parametre olarak alsın ve Dünya kupası finallerinde en çok gol atan takımı döndürsün */
 
-function EnCokGolAtan(/* kodlar buraya */) {
+function EnCokGolAtan(data) {
+	let enCokGol=0;
+	let enCokGolKey="";
+	let finalMaclar = (data.filter(mac=>mac["Stage"]==="Final")).map(mac=>{return {HomeTeamName: mac["Home Team Name"],
+	HomeTeamGoals: mac["Home Team Goals"], AwayTeamName: mac["Away Team Name"],
+	AwayTeamGoals: mac["Away Team Goals"], }});
+	let totalGol= finalMaclar.reduce((allCountry, finalMaclar)=>{
+		if (finalMaclar["HomeTeamName"] in allCountry){
+			allCountry[finalMaclar["HomeTeamName"]] += finalMaclar["HomeTeamGoals"];
+		} 
+		if (finalMaclar["AwayTeamName"] in allCountry){
+			allCountry[finalMaclar["AwayTeamName"]] += finalMaclar["AwayTeamGoals"]; ;
+		} 
+		if (!(finalMaclar["HomeTeamName"] in allCountry)){
+			allCountry[finalMaclar["HomeTeamName"]] = finalMaclar["HomeTeamGoals"];
+		} 
+		if (!(finalMaclar["AwayTeamName"] in allCountry)){
+			allCountry[finalMaclar["AwayTeamName"]] = finalMaclar["AwayTeamGoals"];
+		}
+		return allCountry;
+	} 
+	,{});
+
+	for (var elem in totalGol){
+		if(elem==="Uruguay"){
+			enCokGol=totalGol[elem];
+		}
+		if (enCokGol<totalGol[elem]){
+			enCokGol=totalGol[elem];
+			enCokGolKey=elem;
+		}
 	
-    /* kodlar buraya */
-	
+	}
+	return enCokGolKey;
 }
 
+	
 
+console.log (EnCokGolAtan(fifaData));
 /*  BONUS 3: 
 EnKotuDefans() adında bir fonksiyon yazın, `data` yı parametre olarak alsın ve Dünya kupasında finallerinde en çok golü yiyen takımı döndürsün*/
 
-function EnKotuDefans(/* kodlar buraya */) {
+function EnKotuDefans(data) {
+	let enCokGol=0;
+	let enCokGolKey="";
+	let finalMaclar = (data.filter(mac=>mac["Stage"]==="Final")).map(mac=>{return {HomeTeamName: mac["Home Team Name"],
+	HomeTeamGoals: mac["Home Team Goals"], AwayTeamName: mac["Away Team Name"],
+	AwayTeamGoals: mac["Away Team Goals"], }});
+	let totalGol= finalMaclar.reduce((allCountry, finalMaclar)=>{
+		if (finalMaclar["HomeTeamName"] in allCountry){
+			allCountry[finalMaclar["HomeTeamName"]] += finalMaclar["AwayTeamGoals"];
+		} 
+		if (finalMaclar["AwayTeamName"] in allCountry){
+			allCountry[finalMaclar["AwayTeamName"]] += finalMaclar["HomeTeamGoals"]; ;
+		} 
+		if (!(finalMaclar["HomeTeamName"] in allCountry)){
+			allCountry[finalMaclar["HomeTeamName"]] = finalMaclar["AwayTeamGoals"];
+		} 
+		if (!(finalMaclar["AwayTeamName"] in allCountry)){
+			allCountry[finalMaclar["AwayTeamName"]] = finalMaclar["HomeTeamGoals"];
+		}
+		return allCountry;
+	} 
+	,{});
+	console.log(finalMaclar);
+	console.log(totalGol);
+	for (var elem in totalGol){
+		if(elem==="Uruguay"){
+			enCokGol=totalGol[elem];
+		}
+		if (enCokGol<totalGol[elem]){
+			enCokGol=totalGol[elem];
+			enCokGolKey=elem;
+		}
 	
-    /* kodlar buraya */
-	
-}
+	}
+	return enCokGolKey;
 
+}
+console.log (EnKotuDefans(fifaData));
 
 /* Hala vaktiniz varsa, README dosyasında listelenen hedeflerden istediğinizi aşağıdaki boşluğa yazabilirsiniz. */
 
